@@ -514,6 +514,12 @@ class MsaViz:
         plot_patches = []
         for cnt in range(self.msa_count):
             msa_seq = self.seq_list[cnt]
+            uniq_char = []
+            # for char in msa_seq:
+            #     if char not in uniq_char:
+            #         uniq_char.append(char)
+            #     else:
+            #         continue
             y_lower = self.msa_count - (cnt + 1)
             y_center = y_lower + 0.5
             # Plot label text
@@ -530,7 +536,23 @@ class MsaViz:
             if self._show_count:
                 scale = end - self._start - msa_seq[self._start : end].count("-")
                 ax.text(end + 1, y_center, str(scale), ha="left", va="center", size=10)
+            # if len(uniq_char) > 5:
+            #     color_scheme = "jingping"
+            #     self._color_scheme = COLOR_SCHEMES[color_scheme]
+            #     color = self.color_scheme.get(seq_char, "#FFFFFF")
+            if "--" in msa_seq:
+                color_scheme = "jingping"
+                self._color_scheme = COLOR_SCHEMES[color_scheme]
+            else:
+                color_scheme = self._color_scheme_name
+                self._color_scheme = COLOR_SCHEMES[color_scheme]
             for x_left in range(start, end):
+                uniq_char = []
+                # for char in msa_seq[start:end]:
+                #     if char not in uniq_char:
+                #         uniq_char.append(char)
+                #     else:
+                #         continue
                 # Add colored rectangle patch
                 seq_char = msa_seq[x_left]
                 rect_prop: dict = dict(
@@ -726,9 +748,11 @@ class MsaViz:
             Identity color
         """
         # Exclude characters color
-        exclude_chars = ("-", "*", "X")
+        exclude_chars = ("-", "X")
         if seq_char in exclude_chars:
             return "#FFFFFF"
+        if seq_char == "*":
+            return "#FF0000"
         # Get most common characters in target MSA position
         column_chars = str(self.msa[:, pos])
         counter = Counter(filter(lambda c: c not in exclude_chars, column_chars))
